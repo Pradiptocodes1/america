@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rose Day 🌹</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f7 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: left;
+            max-width: 700px;
+            width: 100%;
+            margin-bottom: 60px;
+            animation: fadeIn 1s ease-in;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 35px 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: #333;
+            line-height: 1.6;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-transform: lowercase;
+        }
+
+        .header .greeting {
+            font-size: 1.3rem;
+            color: #555;
+            margin-bottom: 15px;
+            font-weight: 300;
+            text-transform: lowercase;
+        }
+
+        .header .greeting .name {
+            color: #ff6b9d;
+            font-weight: 400;
+        }
+
+        .header .poem {
+            font-size: 1rem;
+            color: #666;
+            line-height: 1.8;
+            font-weight: 300;
+            text-transform: lowercase;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(180deg, #ff6b9d, #c44569);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .section.unlocked::before {
+            opacity: 1;
+        }
+
+        .section.locked {
+            background: rgba(245, 245, 245, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        .section.locked .icon {
+            color: #999;
+        }
+
+        .section.unlocked:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(255, 107, 157, 0.2);
+        }
+
+        .section-content {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .icon {
+            font-size: 3rem;
+            transition: transform 0.3s ease;
+        }
+
+        .section.unlocked:hover .icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .section-text {
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 8px;
+            color: #333;
+            text-transform: lowercase;
+        }
+
+        .section.locked .section-title {
+            color: #999;
+        }
+
+        .section-subtitle {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 300;
+            text-transform: lowercase;
+        }
+
+        .section.locked .section-subtitle {
+            color: #aaa;
+        }
+
+        .lock-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.2rem;
+            opacity: 0.5;
+        }
+
+        .footer {
+            margin-top: 60px;
+            text-align: center;
+            color: #999;
+            font-size: 0.9rem;
+            font-weight: 300;
+            text-transform: lowercase;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .header .poem {
+                font-size: 1rem;
+            }
+
+            .section {
+                padding: 30px 25px;
+            }
+
+            .section-content {
+                gap: 20px;
+            }
+
+            .icon {
+                font-size: 2.5rem;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="greeting">dear <span class="name">shaswata</span>,</div>
+        <div class="poem">
+            roses are red, violets are blue<br>
+            and umm...sorry i got fumbled,<br>
+            thinking bout youu
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Section 1: Letter -->
+        <div class="section" id="section1" data-unlocked="false" data-link="letter.html">
+            <span class="lock-indicator">🔒</span>
+            <div class="section-content">
+                <div class="icon">💌</div>
+                <div class="section-text">
+                    <div class="section-title">my rose day letter</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Digital Gift -->
+        <div class="section" id="section2" data-unlocked="false" data-download="rose-gift.jpg">
+            <span class="lock-indicator">🔒</span>
+            <div class="section-content">
+                <div class="icon">🎁</div>
+                <div class="section-text">
+                    <div class="section-title">my digital gift</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Item Budget -->
+        <div class="section" id="section3" data-unlocked="false" data-link="budget.html">
+            <span class="lock-indicator">🔒</span>
+            <div class="section-content">
+                <div class="icon">🌹</div>
+                <div class="section-text">
+                    <div class="section-title">item budget?</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        I will unlock the sections soon<br>
+        so keep watching out for them lol 💕
+    </div>
+
+    <script>
+        // ============================================
+        // UNLOCK CONFIGURATION
+        // Change 'false' to 'true' to unlock sections
+        // ============================================
+        const unlockConfig = {
+            section1: false,  // My Rose Day Letter
+            section2: false,  // My Digital Gift
+            section3: false   // Item Budget?
+        };
+
+        // Initialize sections
+        function initializeSections() {
+            Object.keys(unlockConfig).forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                const isUnlocked = unlockConfig[sectionId];
+                
+                if (isUnlocked) {
+                    section.classList.add('unlocked');
+                    section.classList.remove('locked');
+                    section.querySelector('.lock-indicator').textContent = '🔓';
+                    section.style.filter = 'none';
+                    
+                    // Add pink gradient glassmorphism for unlocked sections
+                    section.style.background = 'rgba(255, 240, 245, 0.6)';
+                    section.style.backdropFilter = 'blur(10px)';
+                    section.style.webkitBackdropFilter = 'blur(10px)';
+                } else {
+                    section.classList.add('locked');
+                    section.classList.remove('unlocked');
+                }
+            });
+        }
+
+        // Handle section clicks
+        document.querySelectorAll('.section').forEach(section => {
+            section.addEventListener('click', function() {
+                const sectionId = this.id;
+                const isUnlocked = unlockConfig[sectionId];
+                
+                if (isUnlocked) {
+                    const link = this.dataset.link;
+                    const download = this.dataset.download;
+                    
+                    if (link) {
+                        // Navigate to page
+                        window.location.href = link;
+                    } else if (download) {
+                        // Trigger download
+                        const a = document.createElement('a');
+                        a.href = download;
+                        a.download = download;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    }
+                }
+            });
+        });
+
+        // Initialize on load
+        initializeSections();
+    </script>
+</body>
+</html>

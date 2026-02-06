@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>happy valentines week, cutiee</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            transition: background 0.8s ease;
+        }
+
+        body.success {
+            background: #ffb3d9;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 50px;
+            color: #333;
+            letter-spacing: 1px;
+        }
+
+        h1 .pink {
+            color: #ff69b4;
+        }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px 30px;
+            font-size: 1.5rem;
+            font-family: 'Lato', sans-serif;
+            text-align: center;
+            width: 300px;
+            max-width: 90%;
+            margin: 0 auto;
+            box-shadow: 
+                0 8px 32px 0 rgba(31, 38, 135, 0.15),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+            outline: none;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .glass-input::placeholder {
+            color: rgba(51, 51, 51, 0.5);
+        }
+
+        .glass-input:focus {
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 
+                0 8px 32px 0 rgba(31, 38, 135, 0.25),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
+        }
+
+        .enter-btn {
+            margin-top: 30px;
+            padding: 15px 60px;
+            font-size: 1.2rem;
+            font-family: 'Lato', sans-serif;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            cursor: pointer;
+            color: #333;
+            font-weight: 400;
+            box-shadow: 0 4px 20px 0 rgba(31, 38, 135, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .enter-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        .enter-btn:active {
+            transform: translateY(0);
+        }
+
+        .feedback {
+            margin-top: 30px;
+            min-height: 200px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+        }
+
+        .feedback.hide {
+            animation: fadeOut 0.5s ease forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #ffb3d9;
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .loading-screen.active {
+            display: flex;
+        }
+
+        .loader {
+            width: 40px;
+            height: 40px;
+            color: #f03355;
+            background:
+                conic-gradient(from  -45deg at top    20px left 50% ,#0000 ,currentColor 1deg 90deg,#0000 91deg),
+                conic-gradient(from   45deg at right  20px top  50% ,#0000 ,currentColor 1deg 90deg,#0000 91deg),
+                conic-gradient(from  135deg at bottom 20px left 50% ,#0000 ,currentColor 1deg 90deg,#0000 91deg),
+                conic-gradient(from -135deg at left   20px top  50% ,#0000 ,currentColor 1deg 90deg,#0000 91deg);
+            animation: l4 1.5s infinite cubic-bezier(0.3,1,0,1);
+            margin-bottom: 30px;
+        }
+
+        @keyframes l4 {
+            50%  {width:60px;height: 60px;transform: rotate(180deg)}
+            100% {transform: rotate(360deg)}
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            color: #f03355;
+            font-weight: 300;
+            margin-top: 10px;
+        }
+
+        .container.hide {
+            display: none;
+        }
+
+        .success-screen {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .success-screen.active {
+            display: block;
+        }
+
+        .success-heading {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 30px;
+            color: #333;
+            letter-spacing: 1px;
+        }
+
+        .gif-container {
+            max-width: 400px;
+            width: 100%;
+            margin: 0 auto 30px;
+        }
+
+        .gif-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+        }
+
+        .countdown-text {
+            font-size: 1.3rem;
+            color: #f03355;
+            font-weight: 300;
+            margin-top: 20px;
+        }
+
+        #countdown {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+            border-radius: 20px;
+        }
+
+        .success-text {
+            font-size: 3rem;
+            color: #f03355;
+            font-weight: 300;
+            margin-top: 30px;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>happy <span class="pink">valentines</span> week, cutiee!</h1>
+        
+        <input type="text" class="glass-input" id="passcode" placeholder="enter code">
+        
+        <div>
+            <button class="enter-btn" onclick="checkPasscode()">enter</button>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <!-- Success Screen -->
+    <div class="success-screen" id="successScreen">
+        <h1 class="success-heading">you did it babee</h1>
+        <div class="gif-container">
+            <img src="s3.gif" alt="Love Dog">
+        </div>
+        <div class="countdown-text">redirecting you in <span id="countdown">5</span></div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text" id="loadingText">Setting up Love Tiles...</div>
+    </div>
+
+    
+    <script>
+        const CORRECT_PASSCODE = "pecky";
+        const NEXT_PAGE_URL = "index1.html"; // REPLACE THIS WITH YOUR NEXT PAGE URL
+        
+        const loadingMessages = [
+            "Setting up Love Tiles...",
+            "Fetching latest expense....",
+            "Parsing all my love texts (in JSON lol)...."
+        ];
+
+        // Allow Enter key to submit
+        document.getElementById('passcode').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPasscode();
+            }
+        });
+
+        function checkPasscode() {
+            const input = document.getElementById('passcode').value.toLowerCase();
+            const feedback = document.getElementById('feedback');
+            
+            if (input === CORRECT_PASSCODE) {
+                // Correct passcode - hide main container, show success screen
+                feedback.innerHTML = '';
+                document.body.classList.add('success');
+                document.querySelector('.container').classList.add('hide');
+                
+                // Show success screen
+                document.getElementById('successScreen').classList.add('active');
+                
+                // Start countdown from 3
+                let countdownValue = 5;
+                const countdownElement = document.getElementById('countdown');
+                
+                const countdownInterval = setInterval(() => {
+                    countdownValue--;
+                    if (countdownValue > 0) {
+                        countdownElement.textContent = countdownValue;
+                    } else {
+                        clearInterval(countdownInterval);
+                    }
+                }, 1000);
+                
+                // After 3 seconds, show loading screen
+                setTimeout(() => {
+                    document.getElementById('successScreen').classList.remove('active');
+                    showLoadingScreen();
+                }, 5000);
+                
+            } else {
+                // Wrong passcode - change heading and show sad dog
+                const heading = document.querySelector('h1');
+                heading.innerHTML = 'try again babee';
+                
+                feedback.className = 'feedback show';
+                feedback.innerHTML = `
+                    <div class="gif-container">
+                        <img src="s2.gif" alt="Sad Dog">
+                    </div>
+                `;
+                
+                // Fade out after 2 seconds and reset heading
+                setTimeout(() => {
+                    feedback.classList.add('hide');
+                    setTimeout(() => {
+                        feedback.innerHTML = '';
+                        feedback.className = 'feedback';
+                        heading.innerHTML = 'happy <span class="pink">valentines</span> day, babe!';
+                    }, 500);
+                }, 2000);
+            }
+        }
+
+        function showLoadingScreen() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const loadingText = document.getElementById('loadingText');
+            
+            loadingScreen.classList.add('active');
+            
+            let messageIndex = 0;
+            
+            // Change loading message every 1.7 seconds
+            const messageInterval = setInterval(() => {
+                messageIndex++;
+                if (messageIndex < loadingMessages.length) {
+                    loadingText.textContent = loadingMessages[messageIndex];
+                }
+            }, 1700);
+            
+            // After 5 seconds, redirect to next page
+            setTimeout(() => {
+                clearInterval(messageInterval);
+                window.location.href = NEXT_PAGE_URL;
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
