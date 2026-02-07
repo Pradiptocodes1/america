@@ -76,16 +76,16 @@
         }
 
         .section {
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 240, 245, 0.6);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 192, 217, 0.4);
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 10px 40px rgba(255, 107, 157, 0.15);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            overflow: hidden;
+            overflow: visible;
             cursor: pointer;
         }
 
@@ -97,29 +97,45 @@
             width: 5px;
             height: 100%;
             background: linear-gradient(180deg, #ff6b9d, #c44569);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .section.unlocked::before {
             opacity: 1;
+            transition: opacity 0.3s ease;
+            border-radius: 20px 0 0 20px;
         }
 
-        .section.locked {
-            background: rgba(245, 245, 245, 0.4);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            cursor: not-allowed;
-            filter: grayscale(1);
+        .section::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff6b9d, #ff8fb3, #ffa6c9, #ff6b9d);
+            background-size: 300% 300%;
+            border-radius: 20px;
+            z-index: -1;
+            filter: blur(15px);
+            opacity: 0;
+            animation: glowPulse 3s ease infinite;
+            transition: opacity 0.4s ease;
         }
 
-        .section.locked .icon {
-            color: #999;
-        }
-
-        .section.unlocked:hover {
+        .section:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 50px rgba(255, 107, 157, 0.2);
+            box-shadow: 0 15px 50px rgba(255, 107, 157, 0.35);
+            border-color: rgba(255, 107, 157, 0.6);
+        }
+
+        .section:hover::after {
+            opacity: 0.7;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         .section-content {
@@ -133,7 +149,7 @@
             transition: transform 0.3s ease;
         }
 
-        .section.unlocked:hover .icon {
+        .section:hover .icon {
             transform: scale(1.1) rotate(5deg);
         }
 
@@ -149,10 +165,6 @@
             text-transform: lowercase;
         }
 
-        .section.locked .section-title {
-            color: #999;
-        }
-
         .section-subtitle {
             font-size: 0.9rem;
             color: #666;
@@ -160,24 +172,12 @@
             text-transform: lowercase;
         }
 
-        .section.locked .section-subtitle {
-            color: #aaa;
-        }
-
-        .lock-indicator {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 1.2rem;
-            opacity: 0.5;
-        }
-
         .footer {
             margin-top: 60px;
             text-align: center;
-            color: #999;
+            color: #ff6b9d;
             font-size: 0.9rem;
-            font-weight: 300;
+            font-weight: 400;
             text-transform: lowercase;
         }
 
@@ -231,8 +231,7 @@
 
     <div class="container">
         <!-- Section 1: Letter -->
-        <div class="section" id="section1" data-unlocked="false" data-link="letter.html">
-            <span class="lock-indicator">🔒</span>
+        <div class="section" id="section1" data-link="roseday.html">
             <div class="section-content">
                 <div class="icon">💌</div>
                 <div class="section-text">
@@ -242,8 +241,7 @@
         </div>
 
         <!-- Section 2: Digital Gift -->
-        <div class="section" id="section2" data-unlocked="false" data-download="rose-gift.jpg">
-            <span class="lock-indicator">🔒</span>
+        <div class="section" id="section2" data-download="rose-gift.PNG">
             <div class="section-content">
                 <div class="icon">🎁</div>
                 <div class="section-text">
@@ -253,8 +251,7 @@
         </div>
 
         <!-- Section 3: Item Budget -->
-        <div class="section" id="section3" data-unlocked="false" data-link="budget.html">
-            <span class="lock-indicator">🔒</span>
+        <div class="section" id="section3" data-link="intemr.html">
             <div class="section-content">
                 <div class="icon">🌹</div>
                 <div class="section-text">
@@ -265,72 +262,30 @@
     </div>
 
     <div class="footer">
-        I will unlock the sections soon<br>
-        so keep watching out for them lol 💕
+        click on any section to explore 💕
     </div>
 
     <script>
-        // ============================================
-        // UNLOCK CONFIGURATION
-        // Change 'false' to 'true' to unlock sections
-        // ============================================
-        const unlockConfig = {
-            section1: false,  // My Rose Day Letter
-            section2: false,  // My Digital Gift
-            section3: false   // Item Budget?
-        };
-
-        // Initialize sections
-        function initializeSections() {
-            Object.keys(unlockConfig).forEach(sectionId => {
-                const section = document.getElementById(sectionId);
-                const isUnlocked = unlockConfig[sectionId];
-                
-                if (isUnlocked) {
-                    section.classList.add('unlocked');
-                    section.classList.remove('locked');
-                    section.querySelector('.lock-indicator').textContent = '🔓';
-                    section.style.filter = 'none';
-                    
-                    // Add pink gradient glassmorphism for unlocked sections
-                    section.style.background = 'rgba(255, 240, 245, 0.6)';
-                    section.style.backdropFilter = 'blur(10px)';
-                    section.style.webkitBackdropFilter = 'blur(10px)';
-                } else {
-                    section.classList.add('locked');
-                    section.classList.remove('unlocked');
-                }
-            });
-        }
-
         // Handle section clicks
         document.querySelectorAll('.section').forEach(section => {
             section.addEventListener('click', function() {
-                const sectionId = this.id;
-                const isUnlocked = unlockConfig[sectionId];
+                const link = this.dataset.link;
+                const download = this.dataset.download;
                 
-                if (isUnlocked) {
-                    const link = this.dataset.link;
-                    const download = this.dataset.download;
-                    
-                    if (link) {
-                        // Navigate to page
-                        window.location.href = link;
-                    } else if (download) {
-                        // Trigger download
-                        const a = document.createElement('a');
-                        a.href = download;
-                        a.download = download;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                    }
+                if (link) {
+                    // Navigate to page
+                    window.location.href = link;
+                } else if (download) {
+                    // Trigger download
+                    const a = document.createElement('a');
+                    a.href = download;
+                    a.download = download;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
                 }
             });
         });
-
-        // Initialize on load
-        initializeSections();
     </script>
 </body>
 </html>
