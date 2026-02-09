@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Chocolate Flappy Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            background: #f5e6d3;
+            font-family: Arial, sans-serif;
+            touch-action: none;
+        }
+        
+        /* Music Player Styles */
+        #musicPlayer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(92, 51, 23, 0.95), rgba(62, 39, 35, 0.9));
+            padding: 12px 20px;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            border-top: 3px solid rgba(139, 101, 85, 0.5);
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        #playPauseBtn {
+            background: linear-gradient(145deg, rgba(210, 105, 30, 0.9), rgba(139, 69, 19, 0.9));
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        #playPauseBtn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 18px rgba(210, 105, 30, 0.5);
+        }
+        
+        #playPauseBtn:active {
+            transform: scale(0.95);
+        }
+        
+        .progress-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        #progressBar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        #progressFill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, rgba(210, 105, 30, 0.9), rgba(255, 215, 0, 0.9));
+            border-radius: 10px;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: rgba(255, 215, 0, 0.95);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            font-weight: 500;
+        }
+        
+        .music-title {
+            text-align: center;
+            color: rgba(255, 215, 0, 0.9);
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+        }
+        
+        @media (max-width: 768px) {
+            #musicPlayer {
+                padding: 10px 15px;
+            }
+            
+            #playPauseBtn {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            
+            .music-title {
+                font-size: 11px;
+                margin-bottom: 6px;
+            }
+            
+            .time-display {
+                font-size: 10px;
+            }
+            
+            #progressBar {
+                height: 7px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #musicPlayer {
+                padding: 8px 12px;
+            }
+            
+            #playPauseBtn {
+                width: 32px;
+                height: 32px;
+                font-size: 13px;
+            }
+            
+            .music-title {
+                font-size: 10px;
+                margin-bottom: 5px;
+            }
+            
+            .time-display {
+                font-size: 9px;
+            }
+            
+            #progressBar {
+                height: 6px;
+            }
+        }
+        
+        #gameCanvas {
+            display: block;
+            margin: 0 auto;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%);
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+        
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: #5C3317;
+            text-shadow: 3px 3px 6px rgba(255,255,255,0.9), 0 0 20px rgba(92,51,23,0.5);
+            z-index: 10;
+        }
+        
+        #startScreen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: linear-gradient(145deg, rgba(92, 51, 23, 0.95), rgba(62, 39, 35, 0.95));
+            padding: 40px;
+            border-radius: 20px;
+            color: #fff;
+            z-index: 100;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        
+        #startScreen h1 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        #startScreen p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        #startBtn {
+            padding: 15px 40px;
+            font-size: 24px;
+            background: linear-gradient(145deg, #D2691E, #8B4513);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+            transition: all 0.3s;
+        }
+        
+        #startBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.4);
+        }
+        
+        #gameOver {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: linear-gradient(145deg, rgba(92, 51, 23, 0.98), rgba(62, 39, 35, 0.98));
+            padding: 50px 40px;
+            border-radius: 20px;
+            color: #fff;
+            z-index: 100;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+            min-width: 320px;
+        }
+        
+        #gameOver h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        #gameOver p {
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+        
+        .emoji-large {
+            font-size: 80px;
+            margin: 20px 0;
+            display: block;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        .game-btn {
+            padding: 15px 35px;
+            font-size: 20px;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        
+        #nextPageBtn {
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+            color: #5C3317;
+        }
+        
+        #nextPageBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(255,215,0,0.4);
+        }
+        
+        #restartBtn {
+            background: linear-gradient(145deg, #D2691E, #8B4513);
+        }
+        
+        #restartBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.4);
+        }
+        
+        @media (max-width: 768px) {
+            #score {
+                font-size: 36px;
+                top: 10px;
+            }
+            
+            #startScreen {
+                padding: 30px 25px;
+            }
+            
+            #startScreen h1 {
+                font-size: 32px;
+            }
+            
+            #startScreen p {
+                font-size: 16px;
+            }
+            
+            #startBtn {
+                font-size: 20px;
+                padding: 12px 30px;
+            }
+            
+            #gameOver {
+                padding: 35px 25px;
+                min-width: 280px;
+            }
+            
+            #gameOver h2 {
+                font-size: 36px;
+            }
+            
+            #gameOver p {
+                font-size: 18px;
+            }
+            
+            .emoji-large {
+                font-size: 60px;
+            }
+            
+            .game-btn {
+                font-size: 18px;
+                padding: 12px 25px;
+            }
+            
+            .button-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="score">0</div>
+    
+    <!-- Music Player -->
+    <div id="musicPlayer">
+        <div class="music-title">Good Life</div>
+        <div class="player-controls">
+            <button id="playPauseBtn">▶️</button>
+            <div class="progress-container">
+                <div id="progressBar">
+                    <div id="progressFill"></div>
+                </div>
+                <div class="time-display">
+                    <span id="currentTime">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="startScreen">
+        <h1>🍫 Chocolate Flappy 🍫</h1>
+        <p>Tap or press SPACE to flap!</p>
+        <p>Avoid the chocolate pillars!</p>
+        <p><strong>Get 5+ points to unlock the next page!</strong></p>
+        <button id="startBtn">START GAME</button>
+    </div>
+    
+    <div id="gameOver">
+        <h2 id="gameOverTitle">Game Over!</h2>
+        <span id="gameOverEmoji" class="emoji-large">😢</span>
+        <p id="finalScore">Score: 0</p>
+        <p id="gameOverMessage"></p>
+        <div class="button-container">
+            <button id="nextPageBtn" class="game-btn" style="display: none;">Go to Next Page</button>
+            <button id="restartBtn" class="game-btn">Play Again</button>
+        </div>
+    </div>
+    
+    <canvas id="gameCanvas"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOver');
+        const startBtn = document.getElementById('startBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const nextPageBtn = document.getElementById('nextPageBtn');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const gameOverTitle = document.getElementById('gameOverTitle');
+        const gameOverMessage = document.getElementById('gameOverMessage');
+        const gameOverEmoji = document.getElementById('gameOverEmoji');
+        
+        const SCORE_THRESHOLD = 5;
+        
+        // Set canvas size
+        function resizeCanvas() {
+            const maxWidth = 800;
+            const maxHeight = 600;
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            // Get music player height
+            const musicPlayer = document.getElementById('musicPlayer');
+            const musicPlayerHeight = musicPlayer ? musicPlayer.offsetHeight : 70;
+            
+            // Adjust available height for game canvas
+            const availableHeight = windowHeight - musicPlayerHeight;
+            
+            if (windowWidth < maxWidth || availableHeight < maxHeight) {
+                canvas.width = Math.min(windowWidth, maxWidth);
+                canvas.height = Math.min(availableHeight, maxHeight);
+            } else {
+                canvas.width = maxWidth;
+                canvas.height = maxHeight;
+            }
+        }
+        
+        // Initial resize
+        resizeCanvas();
+        
+        // Resize when window changes
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Game variables
+        let gameStarted = false;
+        let gameRunning = false;
+        let score = 0;
+        let frames = 0;
+        
+        // Chocolate bar (player)
+        const chocolateBar = {
+            x: 80,
+            y: canvas.height / 2,
+            width: 45,
+            height: 65,
+            velocity: 0,
+            gravity: 0.5,
+            jump: -8,
+            rotation: 0
+        };
+        
+        // Pillars
+        const pillars = [];
+        const pillarGap = 180;
+        const pillarWidth = 85;
+        const pillarSpeed = 3;
+        
+        // Particles for effects
+        const particles = [];
+        
+        // Draw chocolate bar with 3D effect
+        function drawChocolateBar() {
+            ctx.save();
+            ctx.translate(chocolateBar.x + chocolateBar.width/2, chocolateBar.y + chocolateBar.height/2);
+            ctx.rotate(chocolateBar.rotation * Math.PI / 180);
+            
+            const x = -chocolateBar.width/2;
+            const y = -chocolateBar.height/2;
+            
+            // Shadow for 3D depth
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(x + 4, y + 4, chocolateBar.width, chocolateBar.height);
+            
+            // Main chocolate body with gradient
+            const mainGradient = ctx.createLinearGradient(x, y, x + chocolateBar.width, y);
+            mainGradient.addColorStop(0, '#2C1810');
+            mainGradient.addColorStop(0.3, '#3E2723');
+            mainGradient.addColorStop(0.7, '#4E342E');
+            mainGradient.addColorStop(1, '#2C1810');
+            ctx.fillStyle = mainGradient;
+            ctx.fillRect(x, y, chocolateBar.width, chocolateBar.height);
+            
+            // Chocolate segments with 3D borders
+            const segmentColor = '#5D4037';
+            const highlightColor = '#6D4C41';
+            
+            // Horizontal segments
+            for (let i = 1; i < 3; i++) {
+                const segY = y + (chocolateBar.height / 3) * i;
+                
+                // Segment line shadow
+                ctx.strokeStyle = '#1A0F0A';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(x, segY + 1);
+                ctx.lineTo(x + chocolateBar.width, segY + 1);
+                ctx.stroke();
+                
+                // Segment line
+                ctx.strokeStyle = segmentColor;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x, segY);
+                ctx.lineTo(x + chocolateBar.width, segY);
+                ctx.stroke();
+                
+                // Highlight
+                ctx.strokeStyle = highlightColor;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x, segY - 1);
+                ctx.lineTo(x + chocolateBar.width, segY - 1);
+                ctx.stroke();
+            }
+            
+            // Vertical segments
+            for (let i = 1; i < 3; i++) {
+                const segX = x + (chocolateBar.width / 3) * i;
+                
+                // Segment line shadow
+                ctx.strokeStyle = '#1A0F0A';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(segX + 1, y);
+                ctx.lineTo(segX + 1, y + chocolateBar.height);
+                ctx.stroke();
+                
+                // Segment line
+                ctx.strokeStyle = segmentColor;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(segX, y);
+                ctx.lineTo(segX, y + chocolateBar.height);
+                ctx.stroke();
+                
+                // Highlight
+                ctx.strokeStyle = highlightColor;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(segX - 1, y);
+                ctx.lineTo(segX - 1, y + chocolateBar.height);
+                ctx.stroke();
+            }
+            
+            // Outer border with 3D effect
+            ctx.strokeStyle = '#8D6E63';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(x, y, chocolateBar.width, chocolateBar.height);
+            
+            // Inner highlight for glossy effect
+            ctx.strokeStyle = 'rgba(139, 101, 85, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x + 2, y + 2, chocolateBar.width - 4, chocolateBar.height - 4);
+            
+            // Shine effect
+            const shineGradient = ctx.createLinearGradient(x, y, x, y + chocolateBar.height/3);
+            shineGradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+            shineGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = shineGradient;
+            ctx.fillRect(x + 3, y + 3, chocolateBar.width - 6, chocolateBar.height/3);
+            
+            ctx.restore();
+        }
+        
+        // Draw chocolate pillar with 3D texture
+        function drawPillar(pillar) {
+            // Top pillar
+            drawPillarSegment(pillar.x, 0, pillarWidth, pillar.top, true);
+            
+            // Bottom pillar
+            drawPillarSegment(pillar.x, pillar.bottom, pillarWidth, canvas.height - pillar.bottom, false);
+        }
+        
+        function drawPillarSegment(x, y, width, height, isTop) {
+            // Shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(x + 6, y + 3, width, height);
+            
+            // Main pillar body with 3D gradient
+            const gradient = ctx.createLinearGradient(x, y, x + width, y);
+            gradient.addColorStop(0, '#4A2C1A');
+            gradient.addColorStop(0.15, '#6F4E37');
+            gradient.addColorStop(0.5, '#8B4513');
+            gradient.addColorStop(0.85, '#6F4E37');
+            gradient.addColorStop(1, '#4A2C1A');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(x, y, width, height);
+            
+            // Texture lines for chocolate flow effect
+            ctx.strokeStyle = 'rgba(92, 51, 23, 0.5)';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < height; i += 15) {
+                ctx.beginPath();
+                ctx.moveTo(x, y + i);
+                ctx.lineTo(x + width, y + i + 5);
+                ctx.stroke();
+            }
+            
+            // Chocolate drips at the edge
+            if (isTop) {
+                for (let i = 0; i < 5; i++) {
+                    const dripX = x + (width / 6) * (i + 0.5);
+                    const dripY = y + height;
+                    
+                    // Drip shadow
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                    ctx.beginPath();
+                    ctx.ellipse(dripX + 2, dripY + 2, 6, 10, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Drip
+                    const dripGradient = ctx.createRadialGradient(dripX, dripY, 0, dripX, dripY, 8);
+                    dripGradient.addColorStop(0, '#6F4E37');
+                    dripGradient.addColorStop(1, '#3E2723');
+                    ctx.fillStyle = dripGradient;
+                    ctx.beginPath();
+                    ctx.ellipse(dripX, dripY, 6, 10, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            // Border highlights
+            ctx.strokeStyle = '#A0826D';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y + height);
+            ctx.stroke();
+            
+            ctx.strokeStyle = '#5C4033';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x + width, y);
+            ctx.lineTo(x + width, y + height);
+            ctx.stroke();
+            
+            // Glossy shine
+            const shineGradient = ctx.createLinearGradient(x, y, x + width/4, y);
+            shineGradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+            shineGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
+            shineGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = shineGradient;
+            ctx.fillRect(x + 5, y, width/4, height);
+        }
+        
+        // Create new pillar
+        function createPillar() {
+            const minTop = 50;
+            const maxTop = canvas.height - pillarGap - 50;
+            const top = Math.random() * (maxTop - minTop) + minTop;
+            
+            pillars.push({
+                x: canvas.width,
+                top: top,
+                bottom: top + pillarGap,
+                scored: false
+            });
+        }
+        
+        // Update game
+        function update() {
+            if (!gameRunning) return;
+            
+            frames++;
+            
+            // Update chocolate bar
+            chocolateBar.velocity += chocolateBar.gravity;
+            chocolateBar.y += chocolateBar.velocity;
+            
+            // Rotate based on velocity
+            chocolateBar.rotation = Math.min(Math.max(chocolateBar.velocity * 3, -20), 90);
+            
+            // Create pillars
+            if (frames % 90 === 0) {
+                createPillar();
+            }
+            
+            // Update pillars
+            for (let i = pillars.length - 1; i >= 0; i--) {
+                pillars[i].x -= pillarSpeed;
+                
+                // Check score
+                if (!pillars[i].scored && pillars[i].x + pillarWidth < chocolateBar.x) {
+                    pillars[i].scored = true;
+                    score++;
+                    scoreDisplay.textContent = score;
+                    
+                    // Create score particle effect
+                    createScoreParticles(pillars[i].x + pillarWidth, canvas.height/2);
+                }
+                
+                // Remove off-screen pillars
+                if (pillars[i].x + pillarWidth < 0) {
+                    pillars.splice(i, 1);
+                }
+            }
+            
+            // Update particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].y += particles[i].vy;
+                particles[i].x += particles[i].vx;
+                particles[i].life--;
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+            
+            // Check collisions
+            checkCollisions();
+        }
+        
+        // Create score particles
+        function createScoreParticles(x, y) {
+            for (let i = 0; i < 10; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: (Math.random() - 0.5) * 4,
+                    life: 30,
+                    color: `hsl(${Math.random() * 60 + 15}, 70%, 50%)`
+                });
+            }
+        }
+        
+        // Check collisions
+        function checkCollisions() {
+            // Ground and ceiling
+            if (chocolateBar.y + chocolateBar.height > canvas.height || chocolateBar.y < 0) {
+                endGame();
+            }
+            
+            // Pillars
+            for (let pillar of pillars) {
+                if (chocolateBar.x + chocolateBar.width > pillar.x &&
+                    chocolateBar.x < pillar.x + pillarWidth) {
+                    if (chocolateBar.y < pillar.top || 
+                        chocolateBar.y + chocolateBar.height > pillar.bottom) {
+                        endGame();
+                    }
+                }
+            }
+        }
+        
+        // Draw game
+        function draw() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw sky gradient with clouds
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(1, '#E0F6FF');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw particles
+            for (let particle of particles) {
+                ctx.fillStyle = particle.color;
+                ctx.globalAlpha = particle.life / 30;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+            
+            // Draw pillars
+            for (let pillar of pillars) {
+                drawPillar(pillar);
+            }
+            
+            // Draw chocolate bar
+            drawChocolateBar();
+        }
+        
+        // Game loop
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Jump function
+        function jump() {
+            if (gameRunning) {
+                chocolateBar.velocity = chocolateBar.jump;
+            }
+        }
+        
+        // Start game
+        function startGame() {
+            gameStarted = true;
+            gameRunning = true;
+            startScreen.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+            score = 0;
+            frames = 0;
+            scoreDisplay.textContent = score;
+            chocolateBar.y = canvas.height / 2;
+            chocolateBar.velocity = 0;
+            chocolateBar.rotation = 0;
+            pillars.length = 0;
+            particles.length = 0;
+        }
+        
+        // End game
+        function endGame() {
+            gameRunning = false;
+            finalScoreDisplay.textContent = `Score: ${score}`;
+            
+            // Check if threshold is met
+            if (score >= SCORE_THRESHOLD) {
+                gameOverTitle.textContent = 'CONGOO BABEE!';
+                gameOverEmoji.textContent = '🎉';
+                gameOverMessage.textContent = 'You have unlocked the next page!';
+                nextPageBtn.style.display = 'inline-block';
+            } else {
+                gameOverTitle.textContent = 'Oops!';
+                gameOverEmoji.textContent = '😢';
+                gameOverMessage.textContent = `You need min ${SCORE_THRESHOLD} points to unlock the next page!`;
+                nextPageBtn.style.display = 'none';
+            }
+            
+            gameOverScreen.style.display = 'block';
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+        nextPageBtn.addEventListener('click', () => {
+            window.location.href = 'final-page.html';
+        });
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (!gameStarted) {
+                    startGame();
+                } else {
+                    jump();
+                }
+            }
+        });
+        
+        // Touch controls
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!gameStarted) {
+                startGame();
+            } else {
+                jump();
+            }
+        });
+        
+        // Mouse controls
+        canvas.addEventListener('click', () => {
+            if (gameStarted && gameRunning) {
+                jump();
+            }
+        });
+        
+        // Start game loop
+        gameLoop();
+        
+        // ===== MUSIC PLAYER WITH VISUALIZER =====
+        
+        // Create audio element
+        const audio = new Audio();
+        // You can replace this with your own music file URL
+        audio.src = 'OneRepublic Good Life (1).mp3'; // Replace with your music file
+        audio.loop = true;
+        audio.volume = 0.3;
+        
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const currentTimeDisplay = document.getElementById('currentTime');
+        const durationDisplay = document.getElementById('duration');
+        
+        let isPlaying = false;
+        
+        // Auto-play music when page loads
+        window.addEventListener('load', () => {
+            // Try to autoplay (some browsers block this)
+            audio.play().then(() => {
+                isPlaying = true;
+                playPauseBtn.textContent = '⏸️';
+            }).catch(() => {
+                // If autoplay is blocked, user will need to click play
+                console.log('Autoplay blocked, click play button to start music');
+            });
+        });
+        
+        // Play/Pause button
+        playPauseBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                playPauseBtn.textContent = '▶️';
+                isPlaying = false;
+            } else {
+                audio.play();
+                playPauseBtn.textContent = '⏸️';
+                isPlaying = true;
+            }
+        });
+        
+        // Update progress bar
+        audio.addEventListener('timeupdate', () => {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressFill.style.width = progress + '%';
+            currentTimeDisplay.textContent = formatTime(audio.currentTime);
+        });
+        
+        // Set duration when loaded
+        audio.addEventListener('loadedmetadata', () => {
+            durationDisplay.textContent = formatTime(audio.duration);
+        });
+        
+        // Click on progress bar to seek
+        progressBar.addEventListener('click', (e) => {
+            const rect = progressBar.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const width = rect.width;
+            const percentage = clickX / width;
+            audio.currentTime = percentage * audio.duration;
+        });
+        
+        // Format time helper
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return mins + ':' + (secs < 10 ? '0' : '') + secs;
+        }
+        
+        // If audio file doesn't exist, create a fallback silent experience
+        audio.addEventListener('error', () => {
+            console.log('Audio file not found. Player still functional.');
+            // Set fake duration
+            durationDisplay.textContent = '3:30';
+        });
+    </script>
+</body>
+</html>
